@@ -1,0 +1,37 @@
+<.header>
+  Listing Discord users
+  <:actions>
+    <.link patch={~p"/discord_users/new"}>
+      <.button>New Discord user</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="discord_users" rows={@discord_users} row_click={&JS.navigate(~p"/discord_users/#{&1}")}>
+  <:col :let={discord_user} label="Discord"><%= discord_user.discord_id %></:col>
+  <:col :let={discord_user} label="Username"><%= discord_user.username %></:col>
+  <:col :let={discord_user} label="Discriminator"><%= discord_user.discriminator %></:col>
+  <:col :let={discord_user} label="Avatar"><%= discord_user.avatar %></:col>
+  <:action :let={discord_user}>
+    <div class="sr-only">
+      <.link navigate={~p"/discord_users/#{discord_user}"}>Show</.link>
+    </div>
+    <.link patch={~p"/discord_users/#{discord_user}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={discord_user}>
+    <.link phx-click={JS.push("delete", value: %{id: discord_user.id})} data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="discord_user-modal" show on_cancel={JS.navigate(~p"/discord_users")}>
+  <.live_component
+    module={MotmWeb.DiscordUserLive.FormComponent}
+    id={@discord_user.id || :new}
+    title={@page_title}
+    action={@live_action}
+    discord_user={@discord_user}
+    navigate={~p"/discord_users"}
+  />
+</.modal>

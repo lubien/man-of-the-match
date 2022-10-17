@@ -17,7 +17,20 @@ defmodule MotmWeb.Router do
   scope "/", MotmWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    # get "/", PageController, :home
+    # live "/discord_users", DiscordUserLive.Index, :index
+    # live "/discord_users/new", DiscordUserLive.Index, :new
+    # live "/discord_users/:id/edit", DiscordUserLive.Index, :edit
+
+    # live "/discord_users/:id", DiscordUserLive.Show, :show
+    # live "/discord_users/:id/show/edit", DiscordUserLive.Show, :edit
+
+    live "/", DiscordMessageLive.Index, :index
+    # live "/discord_messages/new", DiscordMessageLive.Index, :new
+    # live "/discord_messages/:id/edit", DiscordMessageLive.Index, :edit
+
+    # live "/discord_messages/:id", DiscordMessageLive.Show, :show
+    # live "/discord_messages/:id/show/edit", DiscordMessageLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

@@ -1,0 +1,34 @@
+<.header>
+  Discord user <%= @discord_user.id %>
+  <:subtitle>This is a discord_user record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/discord_users/#{@discord_user}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit discord_user</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Discord"><%= @discord_user.discord_id %></:item>
+  <:item title="Username"><%= @discord_user.username %></:item>
+  <:item title="Discriminator"><%= @discord_user.discriminator %></:item>
+  <:item title="Avatar"><%= @discord_user.avatar %></:item>
+</.list>
+
+<.back navigate={~p"/discord_users"}>Back to discord_users</.back>
+
+<.modal 
+  :if={@live_action == :edit} 
+  id="discord_user-modal" 
+  show 
+  on_cancel={JS.patch(~p"/discord_users/#{@discord_user}")}
+>
+  <.live_component
+    module={MotmWeb.DiscordUserLive.FormComponent}
+    id={@discord_user.id}
+    title={@page_title}
+    action={@live_action}
+    discord_user={@discord_user}
+    navigate={~p"/discord_users/#{@discord_user}"}
+  />
+</.modal>

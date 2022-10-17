@@ -1,0 +1,37 @@
+<div class="flow-root">
+  <ul role="list" class="-mb-8">
+    <%= for msg <- @discord_messages do %>
+      <li>
+        <div class="relative pb-8">
+          <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+          <div class="relative flex items-start space-x-3">
+            <div class="relative">
+              <img class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white" src={Discord.discord_avatar_url(msg.discord_user)} alt="">
+
+              <span class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
+                
+              </span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div>
+                <div class="text-sm">
+                  <a href="#" class="font-medium text-gray-900">
+                    <%= if msg.discord_user && Ecto.assoc_loaded?(msg.discord_user) do %>
+                      <%= msg.discord_user.username %>#<%= msg.discord_user.discriminator %>
+                    <% else %>
+                      ?
+                    <% end %>
+                  </a>
+                </div>
+                <p class="mt-0.5 text-sm text-gray-500"><%= msg.inserted_at %></p>
+              </div>
+              <div class="mt-2 text-sm text-gray-700">
+                <p><%= msg.content %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

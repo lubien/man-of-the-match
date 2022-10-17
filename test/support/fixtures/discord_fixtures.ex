@@ -47,4 +47,25 @@ defmodule Motm.DiscordFixtures do
 
     discord_message
   end
+
+  @doc """
+  Generate a unique discord_channel discord_id.
+  """
+  def unique_discord_channel_discord_id, do: "some discord_id#{System.unique_integer([:positive])}"
+
+  @doc """
+  Generate a discord_channel.
+  """
+  def discord_channel_fixture(attrs \\ %{}) do
+    {:ok, discord_channel} =
+      attrs
+      |> Enum.into(%{
+        discord_id: unique_discord_channel_discord_id(),
+        guild_id: "some guild_id",
+        name: "some name"
+      })
+      |> Motm.Discord.create_discord_channel()
+
+    discord_channel
+  end
 end

@@ -122,4 +122,62 @@ defmodule Motm.DiscordTest do
       assert %Ecto.Changeset{} = Discord.change_discord_message(discord_message)
     end
   end
+
+  describe "discord_channels" do
+    alias Motm.Discord.DiscordChannel
+
+    import Motm.DiscordFixtures
+
+    @invalid_attrs %{discord_id: nil, guild_id: nil, name: nil}
+
+    test "list_discord_channels/0 returns all discord_channels" do
+      discord_channel = discord_channel_fixture()
+      assert Discord.list_discord_channels() == [discord_channel]
+    end
+
+    test "get_discord_channel!/1 returns the discord_channel with given id" do
+      discord_channel = discord_channel_fixture()
+      assert Discord.get_discord_channel!(discord_channel.id) == discord_channel
+    end
+
+    test "create_discord_channel/1 with valid data creates a discord_channel" do
+      valid_attrs = %{discord_id: "some discord_id", guild_id: "some guild_id", name: "some name"}
+
+      assert {:ok, %DiscordChannel{} = discord_channel} = Discord.create_discord_channel(valid_attrs)
+      assert discord_channel.discord_id == "some discord_id"
+      assert discord_channel.guild_id == "some guild_id"
+      assert discord_channel.name == "some name"
+    end
+
+    test "create_discord_channel/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Discord.create_discord_channel(@invalid_attrs)
+    end
+
+    test "update_discord_channel/2 with valid data updates the discord_channel" do
+      discord_channel = discord_channel_fixture()
+      update_attrs = %{discord_id: "some updated discord_id", guild_id: "some updated guild_id", name: "some updated name"}
+
+      assert {:ok, %DiscordChannel{} = discord_channel} = Discord.update_discord_channel(discord_channel, update_attrs)
+      assert discord_channel.discord_id == "some updated discord_id"
+      assert discord_channel.guild_id == "some updated guild_id"
+      assert discord_channel.name == "some updated name"
+    end
+
+    test "update_discord_channel/2 with invalid data returns error changeset" do
+      discord_channel = discord_channel_fixture()
+      assert {:error, %Ecto.Changeset{}} = Discord.update_discord_channel(discord_channel, @invalid_attrs)
+      assert discord_channel == Discord.get_discord_channel!(discord_channel.id)
+    end
+
+    test "delete_discord_channel/1 deletes the discord_channel" do
+      discord_channel = discord_channel_fixture()
+      assert {:ok, %DiscordChannel{}} = Discord.delete_discord_channel(discord_channel)
+      assert_raise Ecto.NoResultsError, fn -> Discord.get_discord_channel!(discord_channel.id) end
+    end
+
+    test "change_discord_channel/1 returns a discord_channel changeset" do
+      discord_channel = discord_channel_fixture()
+      assert %Ecto.Changeset{} = Discord.change_discord_channel(discord_channel)
+    end
+  end
 end

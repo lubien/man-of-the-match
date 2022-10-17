@@ -208,4 +208,102 @@ defmodule Motm.Discord do
   def discord_avatar_url(nil) do
     nil
   end
+
+  alias Motm.Discord.DiscordChannel
+
+  @doc """
+  Returns the list of discord_channels.
+
+  ## Examples
+
+      iex> list_discord_channels()
+      [%DiscordChannel{}, ...]
+
+  """
+  def list_discord_channels do
+    Repo.all(DiscordChannel)
+  end
+
+  @doc """
+  Gets a single discord_channel.
+
+  Raises `Ecto.NoResultsError` if the Discord channel does not exist.
+
+  ## Examples
+
+      iex> get_discord_channel!(123)
+      %DiscordChannel{}
+
+      iex> get_discord_channel!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_discord_channel_by_discord_id(discord_id) do
+    Repo.get_by(DiscordChannel, discord_id: discord_id)
+  end
+
+  @doc """
+  Creates a discord_channel.
+
+  ## Examples
+
+      iex> create_discord_channel(%{field: value})
+      {:ok, %DiscordChannel{}}
+
+      iex> create_discord_channel(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_discord_channel(attrs \\ %{}, opts \\ []) do
+    %DiscordChannel{}
+    |> DiscordChannel.changeset(attrs)
+    |> Repo.insert(opts)
+  end
+
+  @doc """
+  Updates a discord_channel.
+
+  ## Examples
+
+      iex> update_discord_channel(discord_channel, %{field: new_value})
+      {:ok, %DiscordChannel{}}
+
+      iex> update_discord_channel(discord_channel, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_discord_channel(%DiscordChannel{} = discord_channel, attrs) do
+    discord_channel
+    |> DiscordChannel.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a discord_channel.
+
+  ## Examples
+
+      iex> delete_discord_channel(discord_channel)
+      {:ok, %DiscordChannel{}}
+
+      iex> delete_discord_channel(discord_channel)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_discord_channel(%DiscordChannel{} = discord_channel) do
+    Repo.delete(discord_channel)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking discord_channel changes.
+
+  ## Examples
+
+      iex> change_discord_channel(discord_channel)
+      %Ecto.Changeset{data: %DiscordChannel{}}
+
+  """
+  def change_discord_channel(%DiscordChannel{} = discord_channel, attrs \\ %{}) do
+    DiscordChannel.changeset(discord_channel, attrs)
+  end
 end

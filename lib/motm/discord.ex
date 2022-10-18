@@ -330,28 +330,30 @@ defmodule Motm.Discord do
   end
 
   def import_from_discord(%Nostrum.Struct.Message{} = msg) do
-    {:ok, user} = create_discord_user(%{
-      discord_id: Integer.to_string(msg.author.id),
-      username: msg.author.username,
-      discriminator: msg.author.discriminator,
-      avatar: msg.author.avatar
+    with {:ok, user} <- upsert_discord_user(msg.author) do
+      create_discord_message(%{
+        discord_user_id: user.id,
+        content: msg.content,
+        channel_id: Integer.to_string(msg.channel_id),
+        discord_id: Integer.to_string(msg.id),
+        guild_id: Integer.to_string(msg.guild_id),
+        inserted_at: msg.timestamp
+      },
+        on_conflict: {:replace, [:content]},
+        conflict_target: [:discord_id]
+      )
+    end
+  end
+
+  def upsert_discord_user(user) do
+    create_discord_user(%{
+      discord_id: Integer.to_string(user.id),
+      username: user.username,
+      discriminator: user.discriminator,
+      avatar: user.avatar
     },
       on_conflict: {:replace, [:avatar]},
       conflict_target: [:discord_id]
     )
-
-    {:ok, message} = create_discord_message(%{
-      discord_user_id: user.id,
-      content: msg.content,
-      channel_id: Integer.to_string(msg.channel_id),
-      discord_id: Integer.to_string(msg.id),
-      guild_id: Integer.to_string(msg.guild_id),
-      inserted_at: msg.timestamp
-    },
-      on_conflict: {:replace, [:content]},
-      conflict_target: [:discord_id]
-    )
-
-    {:ok, message}
   end
 end

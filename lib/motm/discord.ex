@@ -230,6 +230,19 @@ defmodule Motm.Discord do
     |> Repo.exists?()
   end
 
+  def enable_import_from_channel(channel_id) do
+    {:ok, channel} = Nostrum.Api.get_channel(channel_id)
+
+    create_discord_channel(%{
+      name: channel.name,
+      discord_id: Integer.to_string(channel.id),
+      guild_id: Integer.to_string(channel.guild_id),
+    },
+      on_conflict: {:replace, [:name]},
+      conflict_target: [:discord_id]
+    )
+  end
+
   @doc """
   Creates a discord_channel.
 

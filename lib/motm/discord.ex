@@ -116,7 +116,7 @@ defmodule Motm.Discord do
   def list_discord_messages do
     DiscordMessage
     |> order_by([desc: :inserted_at])
-    |> preload([:discord_user])
+    |> preload([:discord_user, :mentions])
     |> Repo.all()
   end
 
@@ -330,14 +330,20 @@ defmodule Motm.Discord do
   end
 
   def import_from_discord(%Nostrum.Struct.Message{} = msg) do
-    with {:ok, user} <- upsert_discord_user(msg.author) do
+    with {:ok, user} <- upsert_discord_user(msg.author),
+         {:ok, mentions} <- Repo.transaction(fn -> Enum.map(msg.mentions, &upsert_discord_user/1) end) do
+      mentions =
+        mentions
+        |> Enum.map(&elem(&1, 1))
+
       create_discord_message(%{
         discord_user_id: user.id,
         content: msg.content,
         channel_id: Integer.to_string(msg.channel_id),
         discord_id: Integer.to_string(msg.id),
         guild_id: Integer.to_string(msg.guild_id),
-        inserted_at: msg.timestamp
+        inserted_at: msg.timestamp,
+        mentions: mentions
       },
         on_conflict: {:replace, [:content]},
         conflict_target: [:discord_id]
@@ -355,5 +361,28 @@ defmodule Motm.Discord do
       on_conflict: {:replace, [:avatar]},
       conflict_target: [:discord_id]
     )
+  end
+
+  def render_message_content(discord_message) do
+    discord_message.content
+    |> String.split(" ")
+    |> Enum.map(fn
+      ("<@" <> _number) = string ->
+        case Regex.run(~r/\<\@(\d+)\>/, string) do
+          [_all, discord_user_id] ->
+            if mentioned = Enum.find(discord_message.mentions, & &1.discord_id == discord_user_id) do
+              {:mention, mentioned}
+            else
+              string
+            end
+
+          _ ->
+            string
+        end
+
+      word ->
+        word
+    end)
+    # |> Enum.join(" ")
   end
 end

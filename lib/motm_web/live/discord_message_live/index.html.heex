@@ -26,7 +26,17 @@
                 <p class="mt-0.5 text-sm text-gray-500"><%= msg.inserted_at %></p>
               </div>
               <div class="mt-2 text-sm text-gray-700">
-                <p><%= msg.content %></p>
+                <p>
+                  <%= for part <- Discord.render_message_content(msg) do %>
+                    <%= case part do %>
+                      <% {:mention, mentioned} -> %>
+                        <a href="#" class="text-blue-500"><%= "@#{mentioned.username}##{mentioned.discriminator}" %></a>
+
+                      <% string -> %>
+                        <%= string %>
+                    <% end %>
+                  <% end %>
+                </p>
               </div>
             </div>
           </div>

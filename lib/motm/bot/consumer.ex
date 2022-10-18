@@ -22,21 +22,14 @@ defmodule Motm.Bot.Consumer do
         )
 
       "!import-messages-to-man-of-the-match" ->
-        {:ok, messages} = Nostrum.Api.get_channel_messages(msg.channel_id, 100)
-
-        messages =
-          messages
-          |> Enum.map(&Map.put(&1, :guild_id, msg.guild_id))
-
-        Motm.Repo.transaction(fn ->
-          for msg <- messages do
-            Discord.import_from_discord(msg)
-          end
-        end)
+        if Discord.can_import_from_channel?(Integer.to_string(msg.channel_id)) do
+          Discord.import_latest_channel_messages(msg.guild_id, msg.channel_id)
+        end
 
       _ ->
         if Discord.can_import_from_channel?(Integer.to_string(msg.channel_id)) do
           Discord.import_from_discord(msg)
+          {:ok} = Nostrum.Api.create_reaction(msg.channel_id, msg.id, "✅")
         end
 
         :ignore

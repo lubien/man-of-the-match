@@ -295,6 +295,18 @@ defmodule Motm.Discord do
     DiscordChannel.changeset(discord_channel, attrs)
   end
 
+  def import_latest_channel_messages(guild_id, channel_id) do
+    {:ok, messages} = Nostrum.Api.get_channel_messages(channel_id, 100)
+
+    messages =
+      messages
+      |> Enum.map(&Map.put(&1, :guild_id, guild_id))
+
+    Repo.transaction(fn ->
+      Enum.map(messages, &import_from_discord/1)
+    end)
+  end
+
   def import_from_discord(%Nostrum.Struct.Message{content: content}) when content in [
     "!add-channel-to-man-of-the-match",
     "!import-messages-to-man-of-the-match",
@@ -326,8 +338,6 @@ defmodule Motm.Discord do
       on_conflict: {:replace, [:content]},
       conflict_target: [:discord_id]
     )
-
-    {:ok} = Nostrum.Api.create_reaction(msg.channel_id, msg.id, "✅")
 
     {:ok, message}
   end

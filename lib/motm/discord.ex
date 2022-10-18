@@ -327,8 +327,6 @@ defmodule Motm.Discord do
       conflict_target: [:discord_id]
     )
 
-    user |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
-
     {:ok, message} = create_discord_message(%{
       discord_user_id: user.id,
       content: msg.content,
@@ -340,7 +338,6 @@ defmodule Motm.Discord do
       on_conflict: {:replace, [:content]},
       conflict_target: [:discord_id]
     )
-    message |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
 
     {:ok} = Nostrum.Api.create_reaction(msg.channel_id, msg.id, "✅")
 

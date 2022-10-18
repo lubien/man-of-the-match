@@ -8,12 +8,9 @@ defmodule Motm.Bot.Consumer do
   end
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
-    msg |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
-
     case msg.content do
       "!add-channel-to-man-of-the-match" ->
         {:ok, channel} = Nostrum.Api.get_channel(msg.channel_id)
-        channel |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
 
         {:ok, _channel} = Discord.create_discord_channel(%{
           name: channel.name,
@@ -26,9 +23,6 @@ defmodule Motm.Bot.Consumer do
 
       "!import-messages-to-man-of-the-match" ->
         {:ok, messages} = Nostrum.Api.get_channel_messages(msg.channel_id, 100)
-
-        # messages |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
-        msg.guild_id |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
 
         messages =
           messages
@@ -45,8 +39,6 @@ defmodule Motm.Bot.Consumer do
           msg.channel_id
           |> Integer.to_string()
           |> Discord.get_discord_channel_by_discord_id()
-
-        channel |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
 
         if channel do
           Discord.import_from_discord(msg)

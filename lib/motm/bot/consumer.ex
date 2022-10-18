@@ -18,6 +18,7 @@ defmodule Motm.Bot.Consumer do
       "!import-messages-to-man-of-the-match" ->
         if Discord.can_import_from_channel?(Integer.to_string(msg.channel_id)) do
           Discord.import_latest_channel_messages(msg.guild_id, msg.channel_id)
+          {:ok} = Nostrum.Api.create_reaction(msg.channel_id, msg.id, "✅")
         end
 
       _ ->

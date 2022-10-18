@@ -5,6 +5,7 @@ defmodule Motm.Discord do
 
   import Ecto.Query, warn: false
   alias Motm.Repo
+  alias Phoenix.PubSub
 
   alias Motm.Discord.DiscordUser
 
@@ -149,9 +150,12 @@ defmodule Motm.Discord do
 
   """
   def create_discord_message(attrs \\ %{}, opts \\ []) do
-    %DiscordMessage{}
-    |> DiscordMessage.changeset(attrs)
-    |> Repo.insert(opts)
+    changeset = DiscordMessage.changeset(%DiscordMessage{}, attrs)
+
+    with {:ok, message} <- Repo.insert(changeset, opts) do
+      PubSub.broadcast(Motm.PubSub, "messages", {:message_created, message})
+      {:ok, message}
+    end
   end
 
   @doc """

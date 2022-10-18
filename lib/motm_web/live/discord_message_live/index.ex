@@ -1,11 +1,13 @@
 defmodule MotmWeb.DiscordMessageLive.Index do
   use MotmWeb, :live_view
 
+  alias Phoenix.PubSub
   alias Motm.Discord
   alias Motm.Discord.DiscordMessage
 
   @impl true
   def mount(_params, _session, socket) do
+    PubSub.subscribe(Motm.PubSub, "messages")
     {:ok, assign(socket, :discord_messages, list_discord_messages())}
   end
 
@@ -38,6 +40,12 @@ defmodule MotmWeb.DiscordMessageLive.Index do
     {:ok, _} = Discord.delete_discord_message(discord_message)
 
     {:noreply, assign(socket, :discord_messages, list_discord_messages())}
+  end
+
+  @impl true
+  def handle_info({:message_created, message}, socket) do
+    message = Motm.Repo.preload(message, [:discord_user])
+    {:noreply, assign(socket, :discord_messages, [message | socket.assigns.discord_messages])}
   end
 
   defp list_discord_messages do

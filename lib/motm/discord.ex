@@ -224,22 +224,10 @@ defmodule Motm.Discord do
     Repo.all(DiscordChannel)
   end
 
-  @doc """
-  Gets a single discord_channel.
-
-  Raises `Ecto.NoResultsError` if the Discord channel does not exist.
-
-  ## Examples
-
-      iex> get_discord_channel!(123)
-      %DiscordChannel{}
-
-      iex> get_discord_channel!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_discord_channel_by_discord_id(discord_id) do
-    Repo.get_by(DiscordChannel, discord_id: discord_id)
+  def can_import_from_channel?(channel_id) do
+    DiscordChannel
+    |> where(discord_id: ^channel_id)
+    |> Repo.exists?()
   end
 
   @doc """

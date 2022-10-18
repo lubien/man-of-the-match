@@ -35,12 +35,7 @@ defmodule Motm.Bot.Consumer do
         end)
 
       _ ->
-        channel =
-          msg.channel_id
-          |> Integer.to_string()
-          |> Discord.get_discord_channel_by_discord_id()
-
-        if channel do
+        if Discord.can_import_from_channel?(Integer.to_string(msg.channel_id)) do
           Discord.import_from_discord(msg)
         end
 

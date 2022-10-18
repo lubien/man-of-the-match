@@ -15,7 +15,7 @@ defmodule Motm.Discord.DiscordMessage do
   @doc false
   def changeset(discord_message, attrs) do
     discord_message
-    |> cast(attrs, [:content, :discord_id, :guild_id, :channel_id, :discord_user_id])
+    |> cast(attrs, [:content, :discord_id, :guild_id, :channel_id, :discord_user_id, :inserted_at])
     |> validate_required([:content, :discord_id, :guild_id, :channel_id, :discord_user_id])
     |> unique_constraint(:discord_id)
   end

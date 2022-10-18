@@ -306,4 +306,44 @@ defmodule Motm.Discord do
   def change_discord_channel(%DiscordChannel{} = discord_channel, attrs \\ %{}) do
     DiscordChannel.changeset(discord_channel, attrs)
   end
+
+  def import_from_discord(%Nostrum.Struct.Message{content: content}) when content in [
+    "!add-channel-to-man-of-the-match",
+    "!import-messages-to-man-of-the-match",
+    nil,
+    ""
+  ] do
+    {:ok, :ignore}
+  end
+
+  def import_from_discord(%Nostrum.Struct.Message{} = msg) do
+    {:ok, user} = create_discord_user(%{
+      discord_id: Integer.to_string(msg.author.id),
+      username: msg.author.username,
+      discriminator: msg.author.discriminator,
+      avatar: msg.author.avatar
+    },
+      on_conflict: {:replace, [:avatar]},
+      conflict_target: [:discord_id]
+    )
+
+    user |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
+
+    {:ok, message} = create_discord_message(%{
+      discord_user_id: user.id,
+      content: msg.content,
+      channel_id: Integer.to_string(msg.channel_id),
+      discord_id: Integer.to_string(msg.id),
+      guild_id: Integer.to_string(msg.guild_id),
+      inserted_at: msg.timestamp
+    },
+      on_conflict: {:replace, [:content]},
+      conflict_target: [:discord_id]
+    )
+    message |> IO.inspect(label: "#{__MODULE__}:#{__ENV__.line} #{DateTime.utc_now}", limit: :infinity)
+
+    {:ok} = Nostrum.Api.create_reaction(msg.channel_id, msg.id, "✅")
+
+    {:ok, message}
+  end
 end

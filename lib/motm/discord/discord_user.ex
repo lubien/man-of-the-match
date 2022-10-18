@@ -15,7 +15,7 @@ use Ecto.Schema
   def changeset(discord_user, attrs) do
     discord_user
     |> cast(attrs, [:discord_id, :username, :discriminator, :avatar])
-    |> validate_required([:discord_id, :username, :discriminator, :avatar])
+    |> validate_required([:discord_id, :username, :discriminator])
     |> unique_constraint(:discord_id)
   end
 end
